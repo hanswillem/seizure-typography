@@ -50,7 +50,7 @@ function draw() {
 }
 
 function mousePressed() {
-  if (mouseY > height / 2 && mouseY < height) {
+  if (mouseX > 0 && mouseX < width && mouseY > height / 2 && mouseY < height) {
     seizureIndex ++;
     seizureIndex = seizureIndex % 3;
     seizure = seizures[seizureIndex];
@@ -135,7 +135,7 @@ function drawCircleOverSeizure(yoff) {
 
 
 function placeType() {
-  if (mouseY > 50 && mouseY < height / 2 - 50 && mouseIsPressed) {
+  if (mouseX > 0 && mouseX < width && mouseY > 50 && mouseY < height / 2 - 50 && mouseIsPressed) {
     typeOff += (mouseY - pmouseY);
     createType(typeOff);
   }
