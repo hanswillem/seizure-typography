@@ -49,13 +49,12 @@ function draw() {
   drawBorder();
 }
 
-function mouseReleased() {
-  if (mouseY > height / 2) {
+function mousePressed() {
+  if (mouseY > height / 2 && mouseY < height) {
     seizureIndex ++;
     seizureIndex = seizureIndex % 3;
     seizure = seizures[seizureIndex];
   }
-
 }
 
 function drawType(yoff) {
