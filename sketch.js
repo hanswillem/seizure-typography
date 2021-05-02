@@ -3,7 +3,7 @@
 // If the canvas size is changed, everything will correctly scale.
 
 let f, g, t, slider, seizure;
-let typeOff = 0;
+let typeOff = 50;
 let margin = 100;
 let eegChannelIndex = 0;
 const clr1 = 0;
@@ -41,10 +41,18 @@ function draw() {
   drawBorder();
 }
 
+// toggle through EEG channels
 function mousePressed() {
-  if (mouseX > 0 && mouseX < width && mouseY > height / 2 && mouseY < height) {
+  if (mouseX > 0 && mouseX < width && mouseY > height / 3 * 2 && mouseY < height) {
     eegChannelIndex ++;
     eegChannelIndex = (eegChannelIndex % (seizure.getColumnCount() -1));
+  }
+}
+
+function placeType() {
+  if (mouseX > 0 && mouseX < width && mouseY > 50 && mouseY < height / 3 * 2  && mouseIsPressed) {
+    typeOff += (mouseY - pmouseY);
+    createType(typeOff);
   }
 }
 
@@ -122,14 +130,6 @@ function drawCircleOverSeizure(yoff) {
   fill(255, 0, 255);
   noStroke();
   circle(x, y + yoff, 15);
-}
-
-
-function placeType() {
-  if (mouseX > 0 && mouseX < width && mouseY > 50 && mouseY < height / 2 - 50 && mouseIsPressed) {
-    typeOff += (mouseY - pmouseY);
-    createType(typeOff);
-  }
 }
 
 function drawBorder() {
