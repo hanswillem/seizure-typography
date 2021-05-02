@@ -83,7 +83,7 @@ function changeType() {
 }
 
 function createType(yoff) {
-  g = createGraphics(width, height / 2);
+  g = createGraphics(width, height / 4 * 3);
   g.textFont(f);
   g.textSize(parseInt(txtSize.value));
   g.textAlign(CENTER, CENTER);
