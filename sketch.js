@@ -2,31 +2,24 @@
 // Change the eeg channel by clicking on the graph of the seizure.
 // If the canvas size is changed, everything will correctly scale.
 
-let f, g, t, slider, seizure, seizures, seizureNames;
+let f, g, t, slider, seizure;
 let typeOff = 0;
 let margin = 100;
-let seizureIndex = 0;
+let eegChannelIndex = 0;
 const clr1 = 0;
 const clr2 = 255;
 const txt = document.querySelector("input.text");
 const tiles = document.querySelector("input.tiles");
 const seizureScale = document.querySelector("input.seizureScale");
 const txtSize = document.querySelector("input.txtSize");
-const st_01 = "F10-T8";
-const st_02 = "F3-C3";
-const st_03 = "F8-T8";
-
+const speed = document.querySelector("input.speed");
 
 txt.addEventListener("input", changeType);
 txtSize.addEventListener("input", changeType);
 
 function preload() {
   f = loadFont("fonts/OrelegaOne-Regular.ttf");
-  let sz_01 = loadTable('seizures/chb01_04_f10-t8.csv', 'csv', 'header');
-  let sz_02 = loadTable('seizures/chb01_04_f3-c3.csv', 'csv', 'header');
-  let sz_03 = loadTable('seizures/chb01_04_f8-t8.csv', 'csv', 'header');
-  seizures = [sz_01, sz_02, sz_03];
-  seizure = seizures[0];
+  seizure = loadTable('seizures/chb_01_04.csv', 'csv');
 }
 
 function setup() {
@@ -34,7 +27,6 @@ function setup() {
   createType(typeOff);
   noStroke();
   frameRate(12);
-  seizureNames = [st_01, st_02, st_03];
   print(seizure.getRowCount() + " total rows in table");
   print(seizure.getColumnCount() + " total columns in table");
   drawSeizure();
@@ -51,9 +43,8 @@ function draw() {
 
 function mousePressed() {
   if (mouseX > 0 && mouseX < width && mouseY > height / 2 && mouseY < height) {
-    seizureIndex ++;
-    seizureIndex = seizureIndex % 3;
-    seizure = seizures[seizureIndex];
+    eegChannelIndex ++;
+    eegChannelIndex = (eegChannelIndex % (seizure.getColumnCount() -1));
   }
 }
 
@@ -82,8 +73,8 @@ function drawType(yoff) {
 }
 
 function getSeizureValue() {
-  let index = 1 + frameCount % (seizure.getRowCount() - 1);
-  let seizureValue = seizure.getString(index, 1);
+  let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
+  let seizureValue = seizure.getString(i + 2, eegChannelIndex + 1);
   return parseFloat(seizureValue);
 }
 
@@ -108,9 +99,9 @@ function drawSeizure(yoff) {
   stroke(clr2);
   strokeWeight(1);
   beginShape();
-  for (let i = 1; i < seizure.getRowCount() - 1; i++) {
-    let y = parseFloat(seizureScale.value) / 4 * parseFloat(seizure.getString(i, 1));
-    let x = margin + i * ((width - margin * 2) / (seizure.getRowCount() - 2));
+  for (let i = 2; i < seizure.getRowCount() - 2; i++) {
+    let y = parseFloat(seizureScale.value) / 4 * parseFloat(seizure.getString(i, eegChannelIndex + 1));
+    let x = margin + (i - 2) * ((width - margin * 2) / (seizure.getRowCount() - 2));
 
     vertex(x, y + yoff);
   }
@@ -121,16 +112,16 @@ function drawSeizure(yoff) {
   fill(255, 0, 255);
   textSize(12);
   textAlign(CENTER, CENTER);
-  text("[ EEG channel: " + seizureNames[seizureIndex] + " ]", width / 2, height - 40);
+  text("[ EEG channel: " + seizure.getString(0, eegChannelIndex + 1).slice(1, -1) + " ]", width / 2, height - 40);
 }
 
 function drawCircleOverSeizure(yoff) {
-  let i = 1 + frameCount % seizure.getRowCount() - 1;
+  let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
   let x = margin + i * ((width - margin * 2) / (seizure.getRowCount() - 2));
-  let y = parseFloat(seizureScale.value) / 4 * parseFloat(seizure.getString(i, 1));
+  let y = parseFloat(seizureScale.value) / 4 * getSeizureValue();
   fill(255, 0, 255);
   noStroke();
-  circle(x, y + yoff, 20);
+  circle(x, y + yoff, 15);
 }
 
 
