@@ -2,9 +2,8 @@
 // Change the eeg channel by clicking on the graph of the seizure.
 // If the canvas size is changed, everything will correctly scale.
 
-let f, g, t, slider, seizure;
+let f, g, t, slider, seizure, margin, tstamp;
 let typeOff = 50;
-let margin = 100;
 let eegChannelIndex = 0;
 const clr1 = 0;
 const clr2 = 255;
@@ -23,7 +22,8 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(800, 600);
+  createCanvas(windowWidth - 100, windowHeight - 100);
+  margin = windowWidth / 6;
   createType(typeOff);
   noStroke();
   frameRate(12);
@@ -38,21 +38,37 @@ function draw() {
   drawSeizure(height / 4 * 3);
   drawCircleOverSeizure(height / 4 * 3);
   placeType();
+  drawTooltip();
   drawBorder();
-}
-
-// toggle through EEG channels
-function mousePressed() {
-  if (mouseX > 0 && mouseX < width && mouseY > height / 3 * 2 && mouseY < height) {
-    eegChannelIndex ++;
-    eegChannelIndex = (eegChannelIndex % (seizure.getColumnCount() -1));
-  }
 }
 
 function placeType() {
   if (mouseX > 0 && mouseX < width && mouseY > 50 && mouseY < height / 3 * 2  && mouseIsPressed) {
     typeOff += (mouseY - pmouseY);
     createType(typeOff);
+  }
+}
+
+// toggle through EEG channels
+function mousePressed() {
+  if (mouseY > height / 4 * 3 - 200 && mouseY < height / 4 * 3 + 200) {
+
+    if (mouseX < width / 2 - 100) {
+      console.log("previous");
+      if (eegChannelIndex == 0) {
+        eegChannelIndex = seizure.getColumnCount() -2;
+      } else {
+        eegChannelIndex --;
+      }
+    }
+    if (mouseX > width / 2 + 100) {
+      console.log("next");
+      if (eegChannelIndex == seizure.getColumnCount() -2) {
+      eegChannelIndex = 2;
+      } else {
+      eegChannelIndex ++;
+      }
+    }
   }
 }
 
@@ -137,4 +153,28 @@ function drawBorder() {
   stroke(255, 0, 255);
   strokeWeight(4);
   rect(0, 0, width, height)
+}
+
+
+function drawTooltip() {
+  if (mouseY > height / 4 * 3 - 200 && mouseY < height / 4 * 3 + 200) {
+
+    if (mouseX < width / 2 - 100) {
+      makeTooltip('<<')
+    } 
+    if (mouseX > width / 2 + 100) {
+      makeTooltip('>>')
+    }
+  }
+}
+
+function makeTooltip(t) {
+  noStroke();
+  fill(255, 0, 255);
+  rect(mouseX + 10, mouseY + 20, 34, 25);
+  textAlign(LEFT, CENTER);
+  noStroke();
+  fill(255);
+  textSize(18)
+  text(t, mouseX + 16, mouseY + 34);
 }
