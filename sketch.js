@@ -2,7 +2,7 @@
 // Change the eeg channel by clicking on the graph of the seizure.
 // If the canvas size is changed, everything will correctly scale.
 
-let f, g, t, slider, seizure, margin, tstamp;
+let f, g, t, slider, seizure, margin;
 let typeOff = 50;
 let eegChannelIndex = 0;
 const clr1 = 0;
@@ -154,7 +154,6 @@ function drawBorder() {
   strokeWeight(4);
   rect(0, 0, width, height)
 }
-
 
 function drawTooltip() {
   if (mouseY > height / 4 * 3 - 200 && mouseY < height / 4 * 3 + 200) {
