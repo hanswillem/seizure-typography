@@ -54,7 +54,6 @@ function mousePressed() {
   if (mouseY > height / 4 * 3 - 200 && mouseY < height / 4 * 3 + 200) {
 
     if (mouseX < width / 2 - 100) {
-      console.log("previous");
       if (eegChannelIndex == 0) {
         eegChannelIndex = seizure.getColumnCount() -2;
       } else {
@@ -62,7 +61,6 @@ function mousePressed() {
       }
     }
     if (mouseX > width / 2 + 100) {
-      console.log("next");
       if (eegChannelIndex == seizure.getColumnCount() -2) {
       eegChannelIndex = 2;
       } else {
