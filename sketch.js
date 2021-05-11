@@ -134,7 +134,8 @@ function drawType(yoff) {
 
 function getSeizureValue() {
   let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
-  let seizureValue = seizure.getString(i + 2, eegChannelIndex + 1);
+  let seizureValue = seizure.getString(i + 2, eegChannelIndex + 1); 
+  seizureValue *= -1 // EEG needs to be flipped!
   return parseFloat(seizureValue);
 }
 
@@ -161,6 +162,7 @@ function drawSeizure(yoff) {
   beginShape();
   for (let i = 2; i < seizure.getRowCount() - 2; i++) {
     let y = seizureScale / 4 * parseFloat(seizure.getString(i, eegChannelIndex + 1));
+    y *= -1; // EEG needs to be flipped!
     let x = margin + (i - 2) * ((width - margin * 2) / (seizure.getRowCount() - 2));
 
     vertex(x, y + yoff);
@@ -179,6 +181,7 @@ function drawCircleOverSeizure(yoff) {
   let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
   let x = margin + i * ((width - margin * 2) / (seizure.getRowCount() - 2));
   let y = seizureScale / 4 * getSeizureValue();
+  //y *= -1;
   fill(255, 0, 255);
   noStroke();
   circle(x, y + yoff, 15);
