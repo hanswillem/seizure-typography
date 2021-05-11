@@ -181,7 +181,6 @@ function drawCircleOverSeizure(yoff) {
   let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
   let x = margin + i * ((width - margin * 2) / (seizure.getRowCount() - 2));
   let y = seizureScale / 4 * getSeizureValue();
-  //y *= -1;
   fill(255, 0, 255);
   noStroke();
   circle(x, y + yoff, 15);
