@@ -1,5 +1,7 @@
 // Change the y position of the typography with the mouse.
 // Change the eeg channel by clicking on the graph of the seizure.
+// Change the fontsize with the mousewheel or with the up and down arrow keys.
+// Change the EEG size with the mousewheel.
 // If the canvas size is changed, everything will correctly scale.
 
 let f, g, t, slider, seizure, margin;
@@ -9,12 +11,12 @@ const clr1 = 0;
 const clr2 = 255;
 const txt = document.querySelector("input.text");
 const tiles = document.querySelector("input.tiles");
-const seizureScale = document.querySelector("input.seizureScale");
-const txtSize = document.querySelector("input.txtSize");
+let seizureScale = 0.5;
+let txtSize = 200;
 const speed = document.querySelector("input.speed");
 
 txt.addEventListener("input", changeType);
-txtSize.addEventListener("input", changeType);
+//txtSize.addEventListener("input", changeType);
 
 function preload() {
   f = loadFont("fonts/OrelegaOne-Regular.ttf");
@@ -40,7 +42,43 @@ function draw() {
   placeType();
   drawTooltip();
   drawBorder();
+  changeFontSizeWithKeyboard();
 }
+
+function mouseWheel(event) {
+  if (mouseX > 0 && mouseX < width && mouseY > 50 && mouseY < height / 3 * 2) {
+    txtSize -= event.delta / 10;
+    if (txtSize < 4) {
+      txtSize = 4;
+    }
+    createType(typeOff);
+  }
+
+  if (mouseY > height / 4 * 3 - 200 && mouseY < height / 4 * 3 + 200) {
+    seizureScale -= event.delta / 1000;
+    if (seizureScale < 0) {
+      seizureScale = 0;
+    }
+  }
+}
+
+function changeFontSizeWithKeyboard() {
+  if (keyIsDown(UP_ARROW)) {
+    txtSize += 10;
+    if (txtSize < 4) {
+      txtSize = 4;
+    }
+    changeType(typeOff);
+  }
+  if (keyIsDown(DOWN_ARROW)) {
+    txtSize -= 10;
+    if (txtSize < 4) {
+      txtSize = 4;
+    }
+    changeType(typeOff);
+  }
+}
+
 
 function placeType() {
   if (mouseX > 0 && mouseX < width && mouseY > 50 && mouseY < height / 3 * 2  && mouseIsPressed) {
@@ -76,7 +114,7 @@ function drawType(yoff) {
     for (let y = 0; y < t; y++) {
       
       // source
-      let d = sin(frameCount + x + y) * parseFloat(seizureScale.value) / 2 * getSeizureValue();
+      let d = sin(frameCount + x + y) * seizureScale / 2 * getSeizureValue();
       let sx = x * (g.width / t) + d;
       let sy = y * (g.height / t);
       let sw = g.width / t;
@@ -107,7 +145,7 @@ function changeType() {
 function createType(yoff) {
   g = createGraphics(width, height / 4 * 3);
   g.textFont(f);
-  g.textSize(parseInt(txtSize.value));
+  g.textSize(parseInt(txtSize));
   g.textAlign(CENTER, CENTER);
   g.fill(255, 0, 255);
   g.noStroke();
@@ -122,7 +160,7 @@ function drawSeizure(yoff) {
   strokeWeight(1);
   beginShape();
   for (let i = 2; i < seizure.getRowCount() - 2; i++) {
-    let y = parseFloat(seizureScale.value) / 4 * parseFloat(seizure.getString(i, eegChannelIndex + 1));
+    let y = seizureScale / 4 * parseFloat(seizure.getString(i, eegChannelIndex + 1));
     let x = margin + (i - 2) * ((width - margin * 2) / (seizure.getRowCount() - 2));
 
     vertex(x, y + yoff);
@@ -140,7 +178,7 @@ function drawSeizure(yoff) {
 function drawCircleOverSeizure(yoff) {
   let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
   let x = margin + i * ((width - margin * 2) / (seizure.getRowCount() - 2));
-  let y = parseFloat(seizureScale.value) / 4 * getSeizureValue();
+  let y = seizureScale / 4 * getSeizureValue();
   fill(255, 0, 255);
   noStroke();
   circle(x, y + yoff, 15);
