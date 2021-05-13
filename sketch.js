@@ -1,19 +1,21 @@
 // Change the y position of the typography with the mouse.
 // Change the eeg channel by clicking on the graph of the seizure.
-// Change the fontsize with the mousewheel or with the up and down arrow keys.
-// Change the EEG size with the mousewheel.
+// Change the fontsize with the mousewheel or with the left and right arrow keys.
+// Change the EEG size with the mousewheel or with the up and down arrow keys.
+// Change the grid size with the numpad plus and minus keys.
 // If the canvas size is changed, everything will correctly scale.
 
-let f, g, t, slider, seizure, margin;
+let f, g, seizure, margin, speed;
 let typeOff = 50;
 let eegChannelIndex = 0;
+let fps = 12;
 const clr1 = 0;
 const clr2 = 255;
 const txt = document.querySelector("input.text");
 const tiles = document.querySelector("input.tiles");
 let seizureScale = 0.5;
 let txtSize = 200;
-const speed = document.querySelector("input.speed");
+let t = 24;
 
 txt.addEventListener("input", changeType);
 //txtSize.addEventListener("input", changeType);
@@ -28,10 +30,13 @@ function setup() {
   margin = windowWidth / 6;
   createType(typeOff);
   noStroke();
-  frameRate(12);
+  frameRate(fps);
   print(seizure.getRowCount() + " total rows in table");
   print(seizure.getColumnCount() + " total columns in table");
   drawSeizure();
+  speed = Math.round((seizure.getRowCount() - 2) / (10 * fps));
+  console.log("speed: " + speed);
+
 }
 
 function draw() {
@@ -42,7 +47,7 @@ function draw() {
   placeType();
   drawTooltip();
   drawBorder();
-  changeFontSizeWithKeyboard();
+  changeParametersWithArrowKeys();
 }
 
 function mouseWheel(event) {
@@ -62,23 +67,42 @@ function mouseWheel(event) {
   }
 }
 
-function changeFontSizeWithKeyboard() {
-  if (keyIsDown(UP_ARROW)) {
-    txtSize += 10;
-    if (txtSize < 4) {
-      txtSize = 4;
-    }
-    changeType(typeOff);
-  }
-  if (keyIsDown(DOWN_ARROW)) {
+function changeParametersWithArrowKeys() {
+  if (keyIsDown(LEFT_ARROW)) {
     txtSize -= 10;
     if (txtSize < 4) {
       txtSize = 4;
     }
     changeType(typeOff);
   }
+  if (keyIsDown(RIGHT_ARROW)) {
+    txtSize += 10;
+    if (txtSize < 4) {
+      txtSize = 4;
+    }
+    changeType(typeOff);
+  }
+  if (keyIsDown(UP_ARROW)) {
+    seizureScale += 0.1;
+  }
+  if (keyIsDown(DOWN_ARROW)) {
+    seizureScale -= 0.1;
+    if  (seizureScale < 0) {
+      seizureScale = 0;
+    }
+  }
+  // numpad PLUS
+  if (keyIsDown(107)) {
+    t++;
+  }
+  // numpad MINUS
+  if (keyIsDown(109)) {
+    t--;
+    if (t < 1) {
+      t = 1;
+    }
+  }
 }
-
 
 function placeType() {
   if (mouseX > 0 && mouseX < width && mouseY > 50 && mouseY < height / 3 * 2  && mouseIsPressed) {
@@ -109,7 +133,6 @@ function mousePressed() {
 }
 
 function drawType(yoff) {
-  t = parseInt(tiles.value);
   for (let x = 0; x < t; x++) {
     for (let y = 0; y < t; y++) {
       
@@ -133,7 +156,7 @@ function drawType(yoff) {
 }
 
 function getSeizureValue() {
-  let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
+  let i = speed * frameCount % (seizure.getRowCount() - 2);
   let seizureValue = seizure.getString(i + 2, eegChannelIndex + 1); 
   seizureValue *= -1 // EEG needs to be flipped!
   return parseFloat(seizureValue);
@@ -178,7 +201,7 @@ function drawSeizure(yoff) {
 }
 
 function drawCircleOverSeizure(yoff) {
-  let i = parseInt(speed.value) * frameCount % (seizure.getRowCount() - 2);
+  let i = speed * frameCount % (seizure.getRowCount() - 2);
   let x = margin + i * ((width - margin * 2) / (seizure.getRowCount() - 2));
   let y = seizureScale / 4 * getSeizureValue();
   fill(255, 0, 255);
